@@ -69,13 +69,13 @@
 
 (defn- weights->intervals
   "A stateful transducer that converts a sequence of `[id weight]` pairs into a non-decreasing
-   (by interval-uppper-bound) sequence of `[id interval-upper-bound]` pairs"
+   (by interval-upper-bound) sequence of `[id interval-upper-bound]` pairs"
   [rf]
-  (let [mub (volatile! 0)]
+  (let [mutable-upper-bound (volatile! 0)]
     (fn
       ([] (rf))
       ([result] (rf result))
-      ([result [id w]] (rf result [id (vswap! mub + w)])))))
+      ([result [id weight]] (rf result [id (vswap! mutable-upper-bound + weight)])))))
 
 (defn- iub-outcomes
   "Convert a sequence of outcomes-probability tuples into a map of outcomes to
