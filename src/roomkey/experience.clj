@@ -87,8 +87,8 @@
        (into (sorted-map-by hcompare) weights->intervals)))
 
 (def ^{:docstring
-       "Given an experience tree, returns a sequence of [outcomes weight],
-       where the values of weight are monotonically increasing."}
+       "Given an experience tree, returns a sequence of [outcomes upper-bound],
+       where the values of upper-bound are monotonically increasing."}
   intervals
   (comp outcomes-with-prob->outcome-with-iub etree->outcomes-with-prob))
 
@@ -107,8 +107,7 @@
 
 (defn outcomes
   "Given a UUID and a sequence produced by `intervals`, return a map of experience to outcome.
-  The chance of selecting a particular set of outcomes is the weight associated with that map
-  divided by the sum of the weights. This function is deterministic."
+  This function is deterministic."
   [intervals uuid]
   (let [rng (Random. (.hashCode uuid))]
     (random-interval rng intervals)))
