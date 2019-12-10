@@ -2,4 +2,11 @@
  {org.clojure/clojure {:mvn/version "1.10.1"}
   org.clojure/math.combinatorics {:mvn/version "0.1.6"}}
 
- :paths ["src"]}
+ :paths ["src"]
+
+ :aliases
+ {:test
+  {:extra-paths ["test"]
+   :extra-deps {lambdaisland/kaocha {:mvn/version "0.0-554"}
+                lambdaisland/kaocha-midje {:mvn/version "0.0-5"}
+                midje {:mvn/version "1.9.9"}}}}}

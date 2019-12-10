@@ -1,0 +1,5 @@
+#kaocha/v1
+{:tests [{:id :unit
+          :type :kaocha.type/midje
+          :test-paths ["test"]
+          :ns-patterns [".*\\.unit\\..*"]}]}
