@@ -55,7 +55,7 @@
                            (merge memo (cartesian {{exp k} w} (transduce identity rf1 sexp))))
                          {} vs))))
 
-(defn- p-outcomes
+(defn- etree->outcomes-with-prob
   "Convert an experience tree into a map of outcomes to their probability"
   [etree]
   {:pre [(map? etree) (every? string? (keys etree))]
@@ -77,9 +77,9 @@
       ([result] (rf result))
       ([result [id weight]] (rf result [id (vswap! mutable-upper-bound + weight)])))))
 
-(defn- iub-outcomes
+(defn- outcomes-with-prob->outcome-with-iub
   "Convert a sequence of outcomes-probability tuples into a map of outcomes to
-  their interval upper bound"
+  their Interval Upper Bound"
   [op]
   {:post [(sorted? %) (apply <= 0 (map last %)) (= 1 (last (last %)))]}
   (->> op
@@ -90,7 +90,7 @@
        "Given an experience tree, returns a sequence of [outcomes weight],
        where the values of weight are monotonically increasing."}
   intervals
-  (comp iub-outcomes p-outcomes))
+  (comp outcomes-with-prob->outcome-with-iub etree->outcomes-with-prob))
 
 (defn- random-interval
   "Using the given random number generator, select a random interval id from the supplied
