@@ -22,10 +22,6 @@
     [{"exp0" :b, "exp1" :e, "exp2" :g, "exp3" :k, "exp4" false} 16/315]
     [{"exp0" :b, "exp1" :e, "exp2" :g, "exp3" :h, "exp4" true} 2/35]]))
 
-(defn homogeneous?
-  [[x & xs]]
-  (every? #(= x %) xs))
-
 (fact "The experiences are correctly flattened"
       (flattened-tree $etree) => $experience-set-probabilities)
 
@@ -40,9 +36,3 @@
 (fact "Experience outcomes are returned"
       (outcomes $experience-set-probabilities #uuid "555fdcd1-5340-420b-af0f-9208aabad56c")
       => {"exp0" :b, "exp1" :d, "exp2" :g, "exp3" :k, "exp4" true})
-
-(fact "Interval calculations are consistent across calls"
-      (doall (repeatedly 100 #(flattened-tree $etree))) => homogeneous?)
-
-(fact "Experience outcomes are consistent across calls"
-      (doall (repeatedly 100 #(outcomes $experience-set-probabilities #uuid "555fdcd1-5340-420b-af0f-9208aabad56c"))) => homogeneous?)
