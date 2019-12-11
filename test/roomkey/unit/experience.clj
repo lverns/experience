@@ -33,6 +33,14 @@
           [{"exp0" :b
             "exp1" true} 1/2]])
 
+(fact "Impossible experience sets are trimmed"
+      (flattened-tree {"exp0" {:a 1 :b 1}
+                       "exp1" {true 1 false 0}})
+      => [[{"exp0" :a
+            "exp1" true} 1/2]
+          [{"exp0" :b
+            "exp1" true} 1/2]])
+
 (fact "Experience outcomes are returned"
       (outcomes $experience-set-probabilities #uuid "555fdcd1-5340-420b-af0f-9208aabad56c")
       => {"exp0" :b, "exp1" :d, "exp2" :g, "exp3" :k, "exp4" true})
