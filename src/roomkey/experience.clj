@@ -9,7 +9,7 @@
 
   This library provides a function, `flattened-tree`, for converting an experience tree
   into a list of possible experience sets paired with the probability of that set being chosen.
-  `outcomes` is provided to pseodorandomly select a single experience set from that list, using
+  `outcomes` is provided to pseudorandomly select a single experience set from that list, using
   a UUID as the seed."
   (:require [clojure.math.combinatorics :as combo])
   (:import java.util.Random))
