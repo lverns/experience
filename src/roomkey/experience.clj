@@ -7,11 +7,10 @@
   any subexperiences. A path from the root to a leaf represents an alternating sequence of
   experiences and their weighted outcomes.
 
-  This library provides a function, `intervals`, for converting an experience tree into a
-  weighted set of all possible sets of individual outcomes, and a function `outcomes` for
-  selecting one of those sets of outcomes. The two functions could be combined into one, but
-  `intervals` can be expensive for non-trivial experience trees, so it is separate from `outcomes`
-  to allow a client to cache the result."
+  This library provides a function, `flattened-tree`, for converting an experience tree
+  into a list of possible experience sets paired with the probability of that set being chosen.
+  `outcomes` is provided to pseudorandomly select a single experience set from that list, using
+  a UUID as the seed."
   (:require [clojure.math.combinatorics :as combo])
   (:import java.util.Random))
 
@@ -59,55 +58,32 @@
   "Convert an experience tree into a map of outcomes to their probability"
   [etree]
   {:pre [(map? etree) (every? string? (keys etree))]
-   :post []}
+   :post [(apply distinct? (map first %))]}
   (transduce normalize-e rf1 etree))
 
-(defn- hcompare
-  "A crude comparator of maps that only guarantees consistent results, not ordering"
-  [x y]
-  (compare [(count x) (hash x)] [(count y) (hash y)]))
-
-(defn- weights->intervals
-  "A stateful transducer that converts a sequence of `[id weight]` pairs into a non-decreasing
-   (by interval-upper-bound) sequence of `[id interval-upper-bound]` pairs"
-  [rf]
-  (let [mutable-upper-bound (volatile! 0)]
-    (fn
-      ([] (rf))
-      ([result] (rf result))
-      ([result [id weight]] (rf result [id (vswap! mutable-upper-bound + weight)])))))
-
-(defn- outcomes-with-prob->outcome-with-iub
-  "Convert a sequence of outcomes-probability tuples into a map of outcomes to
-  their Interval Upper Bound"
-  [op]
-  {:post [(sorted? %) (apply <= 0 (map last %)) (= 1 (last (last %)))]}
-  (->> op
-       (sort-by (fn [[k _v]] [(count k) (hash k)]))
-       (into (sorted-map-by hcompare) weights->intervals)))
-
-(def ^{:docstring
-       "Given an experience tree, returns a sequence of [outcomes upper-bound],
-       where the values of upper-bound are monotonically increasing."}
-  intervals
-  (comp outcomes-with-prob->outcome-with-iub etree->outcomes-with-prob))
-
-(defn- random-interval
-  "Using the given random number generator, select a random interval id from the supplied
-  sequence of intervals, where intervals are pairs of [id upper-bound] in non-decreasing
-  (monotonic increasing) order of upper-bound"
-  [rng intervals]
-  {:pre [(apply <= 0 (map last intervals))]}
-  (let [sum (last (last intervals))
-        r (- sum (* sum (.nextFloat rng)))]
-    ;; Zero-weight intervals have either an upper bound of zero (in which case they do not satisfy the predicate,
-    ;; r being strictly positive) or they have the same the same upper bound as the preceding (lower) interval,
-    ;; and are always usurped in selection by the preceding interval.
-    (some (fn [[id ub]] (when (<= r ub) id)) intervals)))
+(defn flattened-tree
+  "Given an experience tree, returns a sequence of [outcomes probability], where probablity
+  is the probablity of selecting that set of outcomes from the entire list.
+  The probabilities sum to 1, and the order of the list is deterministic."
+  [etree]
+  (->> etree
+       etree->outcomes-with-prob
+       (sort-by (fn [[k _v]] [(count k) (hash k)]))))
 
 (defn outcomes
-  "Given a UUID and a sequence produced by `intervals`, return a map of experience to outcome.
-  This function is deterministic."
-  [intervals uuid]
-  (let [rng (Random. (.hashCode uuid))]
-    (random-interval rng intervals)))
+  "Given a UUID and a sequence of pairs, [x prob], where prob is the probability of selecting x,
+   deterministically return some x, based on the UUID. The probabilities must sum to one."
+  [outcome-probabilities uuid]
+  (let [rng (Random. (.hashCode uuid))
+        r (- 1 (.nextFloat rng))]
+    (reduce (fn [cumulative-ub [experiences probability]]
+              ;; zero-probability experiences get either an upper-bound of zero (in which case they
+              ;; will not be selected, r being strictly positive) or they have the same upper-bound
+              ;; as the preceding pair, and are always usurped in selection by the preceding
+              ;; pair
+              (let [upper-bound (+ cumulative-ub probability)]
+                (if (<= r upper-bound)
+                  (reduced experiences)
+                  upper-bound)))
+            0
+            outcome-probabilities)))
