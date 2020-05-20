@@ -13,12 +13,9 @@
 
 ### Releasing Checklist
 
-1. Ensure: all the tests pass.
-2. Ensure: everything is committed.
-3. Push commits: `git push`
-4. Ensure tags are fetched: `git fetch --tags`
-5. Tag, build, and push artifact: `bin/release VERSION_CHANGE` (where `VERSION_CHANGE` is `major`, `minor`, `patch`, etc.)
-6. Push tags: `git push --tags`
+1. Ensure all tests are passing
+2. Ensure [the changelog](./CHANGELOG.md) is up to date
+3. Tag commit with the new version number & push
 
 ## License
 
