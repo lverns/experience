@@ -20,3 +20,9 @@
 5. Tag, build, and push artifact: `bin/release VERSION_CHANGE` (where `VERSION_CHANGE` is `major`, `minor`, `patch`, etc.)
 6. Push tags: `git push --tags`
 
+## License
+
+Copyright © 2020 Hotel JV Services, LLC
+
+Unless otherwise noted, all files in this repository are released
+under the 3-Clause BSD License. See LICENSE for terms.
