@@ -33,6 +33,22 @@
           [{"exp0" :b
             "exp1" true} 1/2]])
 
+(fact "A very simple tree"
+      (flattened-tree {"exp0" {:a 1 :b 1}})
+      => [[{"exp0" :b} 1/2]
+          [{"exp0" :a} 1/2]])
+
+(fact "Tree with single nested experience"
+      (flattened-tree {"exp0" {true 1
+                               false [1 {"dialog" {:v1 1
+                                                   :v2 2}}]}})
+      => [[{"exp0" true}  1/2]
+          [{"exp0" false, "dialog" :v1} 1/6]
+          [{"exp0" false, "dialog" :v2} 1/3]])
+
 (fact "Experience outcomes are returned"
       (outcomes $experience-set-probabilities (Random. (.hashCode #uuid "555fdcd1-5340-420b-af0f-9208aabad56c")))
       => {"exp0" :b, "exp1" :d, "exp2" :g, "exp3" :k, "exp4" true})
+
+
+
