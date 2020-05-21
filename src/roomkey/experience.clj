@@ -71,11 +71,10 @@
        (sort-by (fn [[k _v]] [(count k) (hash k)]))))
 
 (defn outcomes
-  "Given a UUID and a sequence of pairs, [x prob], where prob is the probability of selecting x,
-   deterministically return some x, based on the UUID. The probabilities must sum to one."
-  [outcome-probabilities uuid]
-  (let [rng (Random. (.hashCode uuid))
-        r (- 1 (.nextFloat rng))]
+  "Given a random number generator and a sequence of pairs, [x prob], where prob is the probability of selecting x,
+   deterministically return some x, based on the random number generator. The probabilities must sum to one."
+  [outcome-probabilities rng]
+  (let [r (- 1 (.nextFloat rng))]
     (reduce (fn [cumulative-ub [experiences probability]]
               ;; zero-probability experiences get either an upper-bound of zero (in which case they
               ;; will not be selected, r being strictly positive) or they have the same upper-bound

@@ -34,5 +34,5 @@
             "exp1" true} 1/2]])
 
 (fact "Experience outcomes are returned"
-      (outcomes $experience-set-probabilities #uuid "555fdcd1-5340-420b-af0f-9208aabad56c")
+      (outcomes $experience-set-probabilities (Random. (.hashCode #uuid "555fdcd1-5340-420b-af0f-9208aabad56c")))
       => {"exp0" :b, "exp1" :d, "exp2" :g, "exp3" :k, "exp4" true})
