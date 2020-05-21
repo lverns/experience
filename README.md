@@ -1,5 +1,13 @@
 # com.roomkey/experience
 
+## Usage
+
+Install via [tools-deps](https://clojure.org/guides/deps_and_cli#_using_git_libraries)
+```clojure
+com.roomkey/experience
+  {:git/url "https://github.com/lverns/experience" :sha "<put HEAD of master here>"}}
+```
+
 ## Development
 
 ### Prerequisites
